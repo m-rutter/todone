@@ -12,3 +12,6 @@ reset-db:
 
 dev:
 	cargo watch -x run
+
+sqlx-prepare:
+	cargo sqlx prepare --merged

@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 todone-core = {path = "../todone-core", features = ["back"]}
 
-sqlx = { version = "0.6.2", features = [ "runtime-tokio-native-tls" , "postgres" ] }
+sqlx = { version = "0.6.2", features = [ "runtime-tokio-native-tls" , "postgres", "offline"] }
 tokio = { version = "1.21.2", features = ["full"] }
 axum = "0.6.0-rc.2"
 clap = { version = "4.0.10", features = ["derive", "env"]}
