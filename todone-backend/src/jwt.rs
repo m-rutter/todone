@@ -3,10 +3,9 @@
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use once_cell::sync::Lazy;
 
-static KEYS: Lazy<Keys> = Lazy::new(|| {
-    let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
-    Keys::new(secret.as_bytes())
-});
+use crate::config::CONFIG;
+
+static KEYS: Lazy<Keys> = Lazy::new(|| Keys::new(CONFIG.jwt_secret.as_bytes()));
 
 pub struct Keys {
     encoding: EncodingKey,
