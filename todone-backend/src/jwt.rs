@@ -16,21 +16,7 @@ use crate::error::{Error, Result};
 
 use crate::config::CONFIG;
 
-pub static KEYS: Lazy<Keys> = Lazy::new(|| Keys::new(CONFIG.jwt_secret.as_bytes()));
-
-pub struct Keys {
-    pub encoding: EncodingKey,
-    pub decoding: DecodingKey,
-}
-
-impl Keys {
-    fn new(secret: &[u8]) -> Self {
-        Self {
-            encoding: EncodingKey::from_secret(secret),
-            decoding: DecodingKey::from_secret(secret),
-        }
-    }
-}
+static KEYS: Lazy<Keys> = Lazy::new(|| Keys::new(CONFIG.jwt_secret.as_bytes()));
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -64,6 +50,20 @@ pub fn create_jwt(user_id: &Uuid) -> Result<String> {
     Ok(str)
 }
 
+struct Keys {
+    pub encoding: EncodingKey,
+    pub decoding: DecodingKey,
+}
+
+impl Keys {
+    fn new(secret: &[u8]) -> Self {
+        Self {
+            encoding: EncodingKey::from_secret(secret),
+            decoding: DecodingKey::from_secret(secret),
+        }
+    }
+}
+
 #[async_trait]
 impl<S> FromRequestParts<S> for Claims
 where
@@ -77,8 +77,12 @@ where
             .await
             .map_err(|_| Error::Unauthorized)?;
 
-        let token_data = decode::<Claims>(bearer.token(), &KEYS.decoding, &Validation::default())
-            .map_err(|_| Error::Unauthorized)?;
+        let token_data = decode::<Claims>(
+            bearer.token(),
+            &KEYS.decoding,
+            &Validation::new(Algorithm::HS512),
+        )
+        .map_err(|_| Error::Unauthorized)?;
 
         if Utc::now().timestamp() > token_data.claims.exp {
             return Err(Error::Unauthorized);
