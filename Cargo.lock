@@ -1791,6 +1791,8 @@ dependencies = [
  "thiserror",
  "todone-core",
  "tokio",
+ "tower",
+ "tower-http",
  "uuid",
  "validator",
 ]
@@ -1893,6 +1895,7 @@ dependencies = [
  "tower",
  "tower-layer",
  "tower-service",
+ "tracing",
 ]
 
 [[package]]

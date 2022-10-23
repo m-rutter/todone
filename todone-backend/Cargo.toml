@@ -25,5 +25,7 @@ sqlx = { version = "0.6.2", features = ["runtime-tokio-native-tls" , "postgres",
 thiserror = "1.0.37"
 todone-core = { path = "../todone-core", features = ["back"] }
 tokio = { version = "1.21.2", features = ["full"] }
+tower = "0.4.13"
+tower-http = { version ="0.3.4", features = ["trace"] }
 uuid = { version = "1.2.1", features = ["serde"] }
 validator = { version = "0.16.0", features = ["derive"] }
