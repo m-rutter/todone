@@ -1,0 +1,93 @@
+{
+  "db": "PostgreSQL",
+  "5d6e006b937579d5de75bc3903bcc1127664321df78f3b09052828b398bc163b": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "content",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "complete",
+          "ordinal": 2,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "SELECT todo_id as id, content, complete FROM \"todo\" where user_id = $1"
+  },
+  "94b8e847c674a6cc4fec64d16b3b7465259de97ca455dfee3d4f099dc6b9a835": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user_id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "username",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "password_hash",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "select user_id, username, password_hash from \"user\" where username = $1"
+  },
+  "ca9bf3861fa1a2eec166289d823fb8bedf21f65d0aa06f249d325b06766d8a44": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Text"
+        ]
+      }
+    },
+    "query": "insert into \"user\" (username, password_hash) values ($1, $2)"
+  },
+  "dc7ba2b5daeec680241ffe161bdc6b4c81ac8fca0b42b34eac19401483430bb5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Text"
+        ]
+      }
+    },
+    "query": "insert into \"todo\" (user_id, content) values ($1, $2)"
+  }
+}

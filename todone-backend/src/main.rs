@@ -8,6 +8,8 @@ use todone_backend::{config::CONFIG, endpoints};
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
 
+    env_logger::init();
+
     let db_pool = PgPoolOptions::new().connect(&CONFIG.database_url).await?;
 
     let app = endpoints::app(db_pool);

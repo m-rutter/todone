@@ -17,13 +17,9 @@ pub enum Error {
     #[error("user may not perform that action")]
     Forbidden,
 
-    /// 500
-    #[error("an internal database error occurred")]
-    Sqlx(#[from] sqlx::Error),
-
-    /// 500
-    #[error("an internal server error occurred")]
-    Anyhow(#[from] anyhow::Error),
+    /// 409
+    #[error("{0}")]
+    Conflict(String),
 
     /// 422
     #[error("validation error in request body")]
@@ -33,9 +29,13 @@ pub enum Error {
     #[error("{0}")]
     UnprocessableEntity(String),
 
-    /// 409
-    #[error("{0}")]
-    Conflict(String),
+    /// 500
+    #[error("an internal database error occurred")]
+    Sqlx(#[from] sqlx::Error),
+
+    /// 500
+    #[error("an internal server error occurred")]
+    Anyhow(#[from] anyhow::Error),
 }
 
 impl IntoResponse for Error {

@@ -7,6 +7,7 @@ install-tools:
 reset-db:
 	docker compose down -v
 	docker compose up -d
+	sleep 2
 	sqlx db create
 	sqlx migrate run
 
