@@ -2,8 +2,8 @@ use axum::{Extension, Router};
 use sqlx::PgPool;
 use tower_http::trace::TraceLayer;
 
-mod login;
-mod todos;
+pub mod login;
+pub mod todos;
 
 pub fn app(db: PgPool) -> Router {
     Router::new()

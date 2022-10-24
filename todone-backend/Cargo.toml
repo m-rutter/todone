@@ -21,7 +21,7 @@ regex = "1.6.0"
 serde = { version = "1.0.145", features = ["derive"] }
 serde_json = "1.0.85"
 serde_with = { version = "2.0.0" }
-sqlx = { version = "0.6.2", features = ["runtime-tokio-native-tls" , "postgres", "offline", "uuid"] }
+sqlx = { version = "0.6.2", features = ["runtime-tokio-native-tls" , "postgres", "offline", "uuid", "migrate"] }
 thiserror = "1.0.37"
 todone-core = { path = "../todone-core", features = ["back"] }
 tokio = { version = "1.21.2", features = ["full"] }
