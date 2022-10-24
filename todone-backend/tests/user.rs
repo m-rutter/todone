@@ -12,7 +12,7 @@ use std::borrow::BorrowMut;
 use common::RequestBuilderExt;
 use serde_json::json;
 
-#[sqlx::test(migrations = "../migrations")]
+#[sqlx::test]
 async fn test_create_user(db: PgPool) {
     let mut app = app(db);
 
