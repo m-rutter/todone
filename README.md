@@ -7,7 +7,7 @@ client.
 
 ## Get Started:
 
-Using [`just`](https://github.com/casey/just) and docker
+Using [`just`](https://github.com/casey/just) and docker and cargo
 
 ```sh
 # copy example .env for backend
