@@ -1,21 +1,17 @@
 use std::time::Duration;
 
 use axum::{http::StatusCode, response::IntoResponse, routing::post, Extension, Json, Router};
-use once_cell::sync::Lazy;
 use rand::Rng;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use sqlx::PgPool;
 use validator::Validate;
 
 use crate::{
     error::{Error, Result},
     jwt::create_jwt,
+    models::user::{LoginUser, NewUser, User},
     password,
 };
-
-static USERNAME_RE: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^[0-9A-Za-z_]+$").expect("username regex"));
 
 pub fn router() -> Router {
     Router::new()
@@ -28,22 +24,7 @@ async fn create_user(db: Extension<PgPool>, Json(new_user): Json<NewUser>) -> Re
 
     let password_hash = password::hash_password(new_user.password.to_string()).await?;
 
-    sqlx::query_scalar!(
-        r#"
-        insert into "user" (username, password_hash) 
-        values ($1, $2)
-        "#,
-        new_user.username,
-        password_hash
-    )
-    .execute(&db.0)
-    .await
-    .map_err(|e| match e {
-        sqlx::Error::Database(db_error) if db_error.constraint() == Some("user_username_key") => {
-            Error::Conflict("username taken".into())
-        }
-        _ => e.into(),
-    })?;
+    NewUser::create(&db.0, new_user, password_hash).await?;
 
     Ok(StatusCode::CREATED)
 }
@@ -52,15 +33,7 @@ async fn login_user(
     db: Extension<PgPool>,
     Json(login_user): Json<LoginUser>,
 ) -> Result<impl IntoResponse> {
-    let maybe_user = sqlx::query!(
-        r#"
-        select user_id, username, password_hash 
-        from "user" 
-        where username = $1"#,
-        login_user.username
-    )
-    .fetch_optional(&db.0)
-    .await?;
+    let maybe_user = User::get_by_username(&db.0, &login_user.username).await?;
 
     if let Some(user) = maybe_user {
         if password::verify_password(login_user.password, user.password_hash).await? {
@@ -83,23 +56,8 @@ async fn login_user(
     ))
 }
 
-#[derive(Deserialize, Validate)]
-#[serde(rename_all = "camelCase")]
-struct NewUser {
-    #[validate(length(min = 3, max = 16), regex = "USERNAME_RE")]
-    username: String,
-    #[validate(length(min = 8, max = 32))]
-    password: String,
-}
-
-#[derive(Deserialize)]
-struct LoginUser {
-    username: String,
-    password: String,
-}
-
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct Auth {
-    access_token: String,
+pub struct Auth {
+    pub access_token: String,
 }
