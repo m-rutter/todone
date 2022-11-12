@@ -2,7 +2,7 @@ default:
     just --list
 
 install-tools:
-    cargo install sqlx-cli
+    cargo install sqlx-cli cargo-watch
 
 reset-db:
 	docker compose down -v
@@ -12,7 +12,7 @@ reset-db:
 	cd todone-backend && sqlx migrate run
 
 dev:
-	cargo watch -x run
+	cd todone-backend && cargo watch -x run
 
 sqlx-prepare:
 	cargo sqlx prepare --merged
