@@ -1,6 +1,6 @@
 use axum::{extract::Path, routing::get, Extension, Json, Router};
 use serde::{Deserialize, Serialize};
-use sqlx::{query_as, types::Uuid, FromRow, PgPool};
+use sqlx::{query, query_as, types::Uuid, FromRow, PgPool};
 
 use crate::{error::Result, jwt::Claims};
 
@@ -53,22 +53,51 @@ async fn update_todo(
     Path(todo_id): Path<Uuid>,
     Json(todo_update): Json<UpdateTodo>,
 ) -> Result<Json<Todo>> {
+    let mut transaction = db.0.begin().await?;
+
+    if let Some(content) = todo_update.content {
+        query!(
+            r#"
+        update "todo" 
+        set
+            content = $1
+        where user_id = $2 and todo_id = $3
+    "#,
+            content,
+            claims.sub,
+            todo_id
+        )
+        .execute(&mut transaction)
+        .await?;
+    }
+
+    if let Some(complete) = todo_update.complete {
+        query!(
+            r#"
+        update "todo" 
+        set
+            complete = $1
+        where user_id = $2 and todo_id = $3
+    "#,
+            complete,
+            claims.sub,
+            todo_id
+        )
+        .execute(&mut transaction)
+        .await?;
+    }
+
     let todo = query_as!(
         Todo,
         r#"
-        update "todo" 
-            set 
-                content = $1, 
-                complete = $2
-        where user_id = $3 and todo_id = $4
-        returning todo_id as id, content, complete
-    "#,
-        todo_update.content,
-        todo_update.complete,
+        select 
+            todo_id as id, content, complete 
+        from "todo" 
+        where user_id = $1 and todo_id = $2"#,
         claims.sub,
         todo_id
     )
-    .fetch_one(&db.0)
+    .fetch_one(&mut transaction)
     .await?;
 
     Ok(Json(todo))
@@ -110,6 +139,6 @@ struct NewTodo {
 #[derive(Debug, Deserialize)]
 
 struct UpdateTodo {
-    content: String,
-    complete: bool,
+    content: Option<String>,
+    complete: Option<bool>,
 }
