@@ -22,3 +22,8 @@ just reset-db
 # run backend development build in watch mode
 just dev
 ```
+
+## Insomnia
+
+To try out the api, there is an `insomnia.json` file that works with
+[`Insomnia`](https://insomnia.rest/) at the project root
