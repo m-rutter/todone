@@ -12,7 +12,6 @@ axum = { version = "0.6.0-rc.4", features = ["headers", "tower-log"] }
 chrono = "0.4.22"
 clap = { version = "4.0.18", features = ["derive", "env"] }
 dotenv = "0.15.0"
-env_logger = "0.9.3"
 jsonwebtoken = "8.1.1"
 once_cell = "1.15.0"
 rand = "0.8.5"

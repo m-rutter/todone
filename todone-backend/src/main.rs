@@ -10,8 +10,6 @@ use tracing_subscriber::{EnvFilter, FmtSubscriber};
 async fn main() -> anyhow::Result<()> {
     dotenv::dotenv().ok();
 
-    env_logger::init();
-
     // Setting up logging
     {
         let subscriber = FmtSubscriber::builder()
