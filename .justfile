@@ -2,7 +2,10 @@ default:
     just --list
 
 install-tools:
-    cargo install sqlx-cli cargo-watch
+	cargo install sqlx-cli cargo-watch 
+	cargo install --locked trunk
+	cargo install --locked wasm-bindgen-cli
+	rustup target add wasm32-unknown-unknown
 
 reset-db:
 	docker compose down -v
@@ -13,6 +16,10 @@ reset-db:
 
 dev:
 	cd todone-backend && cargo watch -x run
+
+dev-fe:
+	cd todone-frontend && cargo watch -x run
+
 
 sqlx-prepare:
 	cd todone-backend && cargo sqlx prepare --merged
