@@ -15,4 +15,4 @@ dev:
 	cd todone-backend && cargo watch -x run
 
 sqlx-prepare:
-	cargo sqlx prepare --merged
+	cd todone-backend && cargo sqlx prepare --merged
