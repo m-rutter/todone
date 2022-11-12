@@ -11,7 +11,7 @@ Using [`just`](https://github.com/casey/just) and docker
 
 ```sh
 # copy example .env for backend
-cd todone-backend && cp .env.example .env
+cp ./todone-backend/.env.example ./todone-backend/.env
 
 # install tools
 just install-tools
