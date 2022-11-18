@@ -5,7 +5,7 @@ use sqlx::{FromRow, PgPool};
 use uuid::Uuid;
 use validator::Validate;
 
-use crate::error::{Error, Result};
+use crate::error::{DbErrorResultExt, Error, Result};
 
 static USERNAME_RE: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^[0-9A-Za-z_]+$").expect("username regex"));
@@ -31,13 +31,8 @@ impl NewUser {
         )
         .execute(db)
         .await
-        .map_err(|e| match e {
-            sqlx::Error::Database(db_error)
-                if db_error.constraint() == Some("user_username_key") =>
-            {
-                Error::Conflict("username taken".into())
-            }
-            _ => e.into(),
+        .on_constraint("user_username_key", |_| {
+            Error::Conflict("username taken".into())
         })?;
 
         Ok(())
