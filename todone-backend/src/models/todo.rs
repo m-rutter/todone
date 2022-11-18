@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::{query, query_as, FromRow, PgPool, Postgres};
 use uuid::Uuid;
 
-use crate::error::Result;
+use crate::error::{Error, Result};
 use crate::jwt::Claims;
 
 #[derive(Debug, Serialize, FromRow)]
@@ -52,8 +52,9 @@ impl Todo {
             claims.sub,
             todo_id
         )
-        .fetch_one(db)
-        .await?;
+        .fetch_optional(db)
+        .await?
+        .ok_or(Error::NotFound)?;
 
         Ok(todo)
     }
