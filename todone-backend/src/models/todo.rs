@@ -124,4 +124,23 @@ impl Todo {
 
         Ok(todo)
     }
+
+    pub async fn delete(
+        db: impl sqlx::Executor<'_, Database = Postgres>,
+        claims: &Claims,
+        todo_id: Uuid,
+    ) -> Result<()> {
+        query!(
+            r#"
+            delete from "todo" 
+            where user_id = $1 and todo_id = $2
+            "#,
+            claims.sub,
+            todo_id,
+        )
+        .execute(db)
+        .await?;
+
+        Ok(())
+    }
 }
