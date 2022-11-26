@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use axum::{http::StatusCode, response::IntoResponse, routing::post, Extension, Json, Router};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, routing::post, Json, Router};
 use rand::Rng;
 use serde::Serialize;
 use sqlx::PgPool;
@@ -13,27 +13,30 @@ use crate::{
     password,
 };
 
-pub fn router() -> Router {
+pub fn router() -> Router<PgPool> {
     Router::new()
         .route("/register", post(create_user))
         .route("/login", post(login_user))
 }
 
-async fn create_user(db: Extension<PgPool>, Json(new_user): Json<NewUser>) -> Result<StatusCode> {
+async fn create_user(
+    State(pool): State<PgPool>,
+    Json(new_user): Json<NewUser>,
+) -> Result<StatusCode> {
     new_user.validate()?;
 
     let password_hash = password::hash_password(new_user.password.to_string()).await?;
 
-    NewUser::create(&db.0, new_user, password_hash).await?;
+    NewUser::create(&pool, new_user, password_hash).await?;
 
     Ok(StatusCode::CREATED)
 }
 
 async fn login_user(
-    db: Extension<PgPool>,
+    State(pool): State<PgPool>,
     Json(login_user): Json<LoginUser>,
 ) -> Result<impl IntoResponse> {
-    let maybe_user = User::get_by_username(&db.0, &login_user.username).await?;
+    let maybe_user = User::get_by_username(&pool, &login_user.username).await?;
 
     if let Some(user) = maybe_user {
         if password::verify_password(login_user.password, user.password_hash).await? {

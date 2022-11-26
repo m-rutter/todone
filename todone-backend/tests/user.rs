@@ -14,7 +14,7 @@ use serde_json::json;
 
 #[sqlx::test]
 async fn test_create_user(db: PgPool) {
-    let mut app = app(db).into_service();
+    let mut app = app(db);
 
     let res = app
         .borrow_mut()
